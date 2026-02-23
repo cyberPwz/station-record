@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊本県 駅タップ（スマホ版）</title>
+
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#eef3f7;
+}
+
+h1{
+  text-align:center;
+  font-size:18px;
+  padding:10px;
+}
+
+.map{
+  position:relative;
+  width:100%;
+  max-width:420px;
+  height:1700px;
+  margin:0 auto;
+  background:white;
+  border-radius:20px;
+  border:2px solid #ccc;
+  overflow-x:auto; /* 横スクロール許可 */
+}
+
+/* 路線 */
+.line{
+  position:absolute;
+  background:#333;
+}
+
+/* 鹿児島本線 */
+.kagoshima{
+  width:6px;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+/* 豊肥本線 */
+.hohi{
+  height:6px;
+}
+
+/* 駅 */
+.station{
+  position:absolute;
+  padding:6px 10px;
+  font-size:13px;
+  background:white;
+  border:2px solid #333;
+  border-radius:15px;
+  transform:translate(-50%,-50%);
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.station.selected{
+  background:red;
+  color:white;
+  border-color:red;
+}
+
+</style>
+</head>
+<body>
+
+<h1>熊本県 駅タップ（スマホ版）</h1>
+
+<div class="map" id="map">
+  <!-- 鹿児島本線 -->
+  <div class="line kagoshima" style="top:60px; height:1500px;"></div>
+
+  <!-- 豊肥本線（長めに） -->
+  <div class="line hohi" style="top:850px; left:50%; width:1500px;"></div>
+</div>
+
+<script>
+
+const stations = [
+
+  // 鹿児島本線（北→南）
+  { name:"荒尾", y:100 },
+  { name:"南荒尾", y:150 },
+  { name:"長洲", y:200 },
+  { name:"大野下", y:250 },
+  { name:"玉名", y:300 },
+  { name:"肥後伊倉", y:350 },
+  { name:"木葉", y:400 },
+  { name:"田原坂", y:450 },
+  { name:"植木", y:500 },
+  { name:"西里", y:550 },
+  { name:"崇城大学前", y:600 },
+  { name:"上熊本", y:650 },
+  { name:"熊本", y:850 },
+  { name:"西熊本", y:920 },
+  { name:"川尻", y:970 },
+  { name:"富合", y:1020 },
+  { name:"宇土", y:1070 },
+  { name:"松橋", y:1120 },
+  { name:"小川", y:1170 },
+  { name:"有佐", y:1220 },
+  { name:"千丁", y:1270 },
+  { name:"新八代", y:1320 },
+  { name:"八代", y:1370 },
+
+  // 豊肥本線（駅間を大きく）
+  { name:"平成", x:120 },
+  { name:"南熊本", x:220 },
+  { name:"新水前寺", x:340 },
+  { name:"水前寺", x:460 },
+  { name:"東海学園前", x:580 },
+  { name:"竜田口", x:700 },
+  { name:"武蔵塚", x:820 },
+  { name:"光の森", x:940 },
+  { name:"三里木", x:1060 },
+  { name:"原水", x:1180 },
+  { name:"肥後大津", x:1300 }
+
+];
+
+const map = document.getElementById("map");
+
+const selectedStations = new Set(
+  JSON.parse(localStorage.getItem("selectedStations") || "[]")
+);
+
+function save(){
+  localStorage.setItem(
+    "selectedStations",
+    JSON.stringify([...selectedStations])
+  );
+}
+
+stations.forEach(st=>{
+  const div = document.createElement("div");
+  div.className="station";
+  div.textContent=st.name;
+
+  if(st.y){
+    div.style.left="50%";
+    div.style.top=st.y+"px";
+  }else{
+    div.style.left=`calc(50% + ${st.x}px)`;
+    div.style.top="850px";
+  }
+
+  if(selectedStations.has(st.name)){
+    div.classList.add("selected");
+  }
+
+  div.addEventListener("click",()=>{
+    if(selectedStations.has(st.name)){
+      selectedStations.delete(st.name);
+      div.classList.remove("selected");
+    }else{
+      selectedStations.add(st.name);
+      div.classList.add("selected");
+    }
+    save();
+  });
+
+  map.appendChild(div);
+});
+
+</script>
+
+</body>
+</html>
